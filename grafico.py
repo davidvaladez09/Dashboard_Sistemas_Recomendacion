@@ -292,7 +292,7 @@ plot_frame = ttk.Frame(root)
 plot_frame.pack(side="right", fill="both", expand=True)
 
 # Crear el widget de Texto para mostrar los resultados debajo de la gráfica
-result_text = ScrolledText(root, wrap=tk.WORD, width=40, height=10)
+result_text = ScrolledText(root, wrap=tk.WORD, width=50, height=5)
 result_text.pack(side="bottom", padx=5, pady=5)
 
 # Botón para limpiar la gráfica
