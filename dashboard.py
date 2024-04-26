@@ -4,6 +4,7 @@ import seaborn as sns
 import numpy as np
 from scipy.spatial import Voronoi, voronoi_plot_2d
 from matplotlib.widgets import Button
+import matplotlib.gridspec as gridspec
 
 # Leer el archivo CSV con pandas (Este código no se ha modificado)
 df = pd.read_csv('D:\\Documentos\\8vo\\Clasificacion Inteligente de Datos\\Dataset\\rotten_tomatoes_movies.csv')
@@ -19,22 +20,26 @@ y7 = x ** 2
 y8 = np.random.normal(size=100)
 y9 = np.random.uniform(size=100)
 
+gs = gridspec.GridSpec(3, 3)  # Definir la cuadrícula
+
 # Función para mostrar la gráfica de Voronoi
 def mostrar_voronoi(event):
-    plt.subplot(3, 3, 8)
+    plt.subplot(3, 3, 9)
     plt.cla()  # Limpiar la subtrama
     points = np.random.rand(10, 2)  # Generar puntos aleatorios
     vor = Voronoi(points)  # Calcular diagrama de Voronoi
     voronoi_plot_2d(vor, show_vertices=False)  # Mostrar el diagrama de Voronoi
-    plt.title('Gráfica 8: Diagrama de Voronoi')
+    plt.title('Diagrama de Voronoi Centroides de Cluster')
     plt.subplots_adjust(left=0.1, bottom=0.3)  # Ajustar el espacio para el botón
     plt.show()
 
 # Crear el dashboard con las gráficas (Este código se ha modificado)
 plt.figure(figsize=(15, 15))
+plt.suptitle('Características de visualizaciones en Amazon Prime Video', fontsize=16)  # Título del dashboard
 
 # Gráfica 1 a 7 (Este código no se ha modificado)
-for i in range(1, 8):
+for i in range(1, 9):
+    ax = plt.subplot(gs[i // 3, i % 3])  # Acceder a cada subplot
     plt.subplot(3, 3, i)
     if i == 1:
         df.groupby('content_rating')['audience_count'].sum().plot(kind='bar')
@@ -61,26 +66,32 @@ for i in range(1, 8):
         plt.ylabel('Audiencia')
     elif i == 6:
         sns.kdeplot(data=df, x='tomatometer_rating', y='audience_rating', cmap='viridis', fill=True)
-        plt.title('Gráfico de Contorno de Audiencia vs Calificación de Críticos')
+        plt.title('Audiencia vs Calificación de Críticos')
         plt.xlabel('Calificación de Críticos')
         plt.ylabel('Audiencia')
     elif i == 7:
         sns.histplot(data=df, x='audience_rating', bins=20, kde=True)
-        plt.title('Gráfica 7: Histograma de Audiencia')
+        plt.title('Histograma de Audiencia')
         plt.xlabel('Audiencia')
         plt.ylabel('Frecuencia')
+    elif i == 8:
+        plt.subplot(3, 3, i)
+        # Calcular la cantidad de películas para cada combinación de clasificación de contenido y tomatometer status
+        content_tomatometer_counts = df.groupby(['content_rating', 'tomatometer_status']).size().unstack(fill_value=0)
+        # Crear la gráfica de barras horizontal
+        content_tomatometer_counts.plot(kind='barh', stacked=True, ax=plt.gca())
+        plt.title('Distribución de Clasificación de Contenido por Tomatometer Status')
+        plt.xlabel('Cantidad de Películas')
+        plt.ylabel('Clasificación de Contenido')
+        plt.legend(title='Tomatometer Status', bbox_to_anchor=(1, 1))
 
-# Agregar botón para mostrar la gráfica de Voronoi
-ax_button = plt.axes([0.3, 0.3, 0.3, 0.10])  # Definir la posición y tamaño del botón
-button = Button(ax_button, 'Mostrar Voronoi')
-button.on_clicked(mostrar_voronoi)  # Asignar la función al botón
+
+# Crear el botón y colocarlo en la posición deseada
+ax_button = plt.subplot(gs[2, 2])  # Acceder al subplot 9 (posición plt.subplot(3, 3, 9))
+button = Button(ax_button, 'Mostrar Grafica Voronoi')
+button.on_clicked(mostrar_voronoi)
 
 plt.tight_layout()
 plt.show()
 
 
-
-# Gráfica 9
-'''plt.subplot(3, 3, 9)
-sns.histplot(y9, kde=True)
-plt.title('Gráfica 9: Distribución Uniforme')'''
